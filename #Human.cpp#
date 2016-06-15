@@ -1,0 +1,93 @@
+
+#include "Human.h"
+#include <string>
+#include <iostream>
+
+using std::string;
+using std::cout;
+using std::cin;
+using std::endl;
+
+Human::Human(Deck &deck, string playerName): Player(deck, playerName) {} 
+
+Human::~Human(){}
+
+int Human::setAction(Market &m){
+    int act;
+    cout << "Options(Take--1,  Trade--2,  Sell--3,  TakeCamel--4): ";
+    cin >> act;
+
+    while (!actionVerify(act,m)){
+        cout << "Invalid action! Try again." << endl;
+        cout << "Options(Take--1,  Trade--2,  Sell--3,  TakeCamel--4): ";
+        cin >> act;
+    }
+
+    return act;
+}
+
+bool Human::actionVerify(int act, Market &m){
+    bool allCamel = true;
+    int nonCML = 0;
+    for (int i = 0; i < 5; ++i){
+        if (m.getGoods(i+1).getCard() != "CAMEL"){
+            allCamel = false;
+            nonCML++;
+        }
+    }
+
+    int gc, dc, sc, rc;
+    gc = dc = sc = rc = 0;
+
+    for (int i = 0; i < getSize(0); ++i){
+        string tmp = getHand(0,i).getCard();
+        if (tmp == "DIAMD")
+            dc++;
+        else if (tmp == "GOLD")
+            gc++;
+        else if (tmp == "SILVR")
+            sc++;
+        else
+            rc++;
+    }
+
+    switch (act){
+        //take
+        case 1:
+        {
+            if (allCamel || getSize(0) == 7)
+                return false;
+            else 
+                return true;
+        }
+
+        // trade
+        case 2:
+        {
+            if (nonCML > 0 && (getSize(0) + getSize(1) > 0))
+                return true;
+            else
+                return false;
+        }
+
+        //sell
+        case 3:
+        {
+            if (gc > 1 || dc > 1 || sc > 1 || rc > 0)
+                return true;
+            else 
+                return false;
+        }
+
+        //take camel
+        case 4:
+        {
+            if (nonCML < 5) 
+                return true;
+            else
+                return false;
+        }
+    }
+
+    return false;
+}
